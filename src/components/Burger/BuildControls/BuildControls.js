@@ -23,6 +23,9 @@ const buildControls = (props) => {
              removed = { () => props.ingredientRemoved(ctrl.type)}
              disabled = {props.disabled[ctrl.type]} />
         ))}
+        <button
+            disabled={!props.purchseable} 
+            onClick={props.purchasing}>Checkout</button>
     </div>
     )
     

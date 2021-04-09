@@ -2,7 +2,8 @@ import React , {Component} from 'react';
 import Aux from '../../hoc/Auxil';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
-
+import Modal from '../../components/UI/Modal/Modal';
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 const INGG_PRICES ={
             salad : 1,
             bacon : 2,
@@ -21,7 +22,9 @@ class BurgerBuilder extends Component {
             cheese : 0,
             meat : 0,
         },
-        totalPrice:4
+        totalPrice:4,
+        purchseable : false,
+        purchasing : false,
     }
 
     addInggHandler = (type) => {
@@ -35,7 +38,7 @@ class BurgerBuilder extends Component {
         const oldPrice = this.state.totalPrice;
         const newPrice = priceAddition+oldPrice;
         this.setState({totalPrice : newPrice, ingredients:updatedIngg});
-
+        this.updatePurchaseState(updatedIngg);
 
 
     }
@@ -54,7 +57,22 @@ class BurgerBuilder extends Component {
         const oldPrice = this.state.totalPrice;
         const newPrice = oldPrice - priceDeduction;
         this.setState({totalPrice : newPrice, ingredients:updatedIngg});
+        this.updatePurchaseState(updatedIngg);
 
+    }
+
+    updatePurchaseState (ingredients) {
+        const sum = Object.keys(ingredients)
+            .map(igKey => {
+                return ingredients[igKey]
+            })
+            .reduce((sum,el)=>{
+                return sum+el;
+            },0);
+            this.setState({purchseable: sum>0});
+    }
+    purchaseHandler =() => {
+        this.setState({purchasing : true});
     }
 
     render(){
@@ -66,12 +84,18 @@ class BurgerBuilder extends Component {
         }
         return(
             <Aux>
+                <Modal show={this.state.purchasing}> 
+                    <OrderSummary ingredients={this.state.ingredients}/>
+                </Modal>
                 <Burger ingredients={this.state.ingredients} />
                 <BuildControls
                 ingredientAdded = {this.addInggHandler}
                 ingredientRemoved = {this.removeInggHandler}
                 disabled = {disabledInfo}
-                price = {this.state.totalPrice} />
+                price = {this.state.totalPrice} 
+                purchseable={this.state.purchseable}
+                purchasing ={this.purchaseHandler}
+                />
             </Aux>
 
         );
